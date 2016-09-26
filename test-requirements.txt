@@ -1,0 +1,7 @@
+testrepository
+python-subunit
+mock
+coverage
+pytest
+pep8
+tox

@@ -1,0 +1,11 @@
+[DEFAULT]
+monitor_es_hosts = []
+write_to_es_hosts = []
+
+[POSITION]
+name = 
+overview_type = 
+indices_type =
+nodes_type =
+
+
