@@ -11,7 +11,7 @@ from oslo_config import cfg
 opts = [
     cfg.BoolOpt('debug',
                 short='d',
-                default=False,
+                default=True,
                 help='Print debugging output (set logging level to '
                      'DEBUG instead of default WARNING level).'),
     cfg.BoolOpt('verbose',
@@ -26,7 +26,7 @@ opts = [
                     'If no default is set, logging will go to stdout.'),
     cfg.StrOpt('log-dir',
                deprecated_name='logdir',
-               default='/tmp',
+               default='/var/log/es_monitor',
                help='(Optional) The base directory used for relative '
                     '--log-file paths'),
 ]

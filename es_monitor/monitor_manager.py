@@ -14,28 +14,32 @@ LOG = logging.getLogger(__name__)
 
 
 es_monitor_opts = [
-        cfg.IntOpt(
-            'check_interval',
-            default=15,
-            help='Interval that between get metrics.'),
-        cfg.ListOpt(
-            'monitor_es_hosts',
-            default=['localhost:9200'],
-            help="ES Cluster to monitor "),
-        cfg.ListOpt(
-            'write_to_es_hosts',
-            default=['localhost:9200'],
-            help="ES Cluster write metrics to"),
-        cfg.StrOpt(
-            'index_name',
-            default='.monitor',
-            help='Index name write to'),
-        cfg.BoolOpt(
-            'update_template',
-            default=True,
-            help="Whether update template for .monitor-*",
-        ),
-        ]
+    cfg.IntOpt(
+        'check_interval',
+        default=15,
+        help='Interval that between get metrics.'
+    ),
+    cfg.ListOpt(
+        'monitor_es_hosts',
+        default=['localhost:9200'],
+        help="ES Cluster to monitor"
+    ),
+    cfg.ListOpt(
+        'write_to_es_hosts',
+        default=['localhost:9200'],
+        help="ES Cluster write metrics to"
+    ),
+    cfg.StrOpt(
+        'index_name',
+        default='.monitor',
+        help='Index name write to'
+    ),
+    cfg.BoolOpt(
+        'update_template',
+        default=True,
+        help="Whether update template for .monitor-*",
+    ),
+]
 
 CONF = cfg.CONF
 CONF.register_opts(es_monitor_opts)
@@ -53,6 +57,7 @@ class MonitorManager(manager.Manager):
         super(MonitorManager, self).__init__(*args, **kwargs)
         self.monitor_cluster_manager = ClusterManager(hosts=CONF.monitor_es_hosts)
         self.monitor_cluster_manager.setup_write_to_es(hosts=CONF.write_to_es_hosts)
+        self.monitor_cluster_manager.set_check_interval(CONF.check_interval)
         if CONF.update_template:
             self.monitor_cluster_manager.update_template(default_template)
 

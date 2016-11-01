@@ -28,12 +28,20 @@ class CatNodesException(EsMonitorException):
     msg_fmt = "Cat Nodes Response Error"
 
 
+class CatShardsException(EsMonitorException):
+    msg_fmt = "Cat Shards Response Error"
+
+
 class ClusterStatsException(EsMonitorException):
     msg_fmt = "Cluster Stats Response Error"
 
 
 class ClusterStateException(EsMonitorException):
     msg_fmt = "Cluster State Response Error"
+
+
+class ClusterHealthException(EsMonitorException):
+    msg_fmt = "Cluster Health Response Error"
 
 
 class IndicesStatsException(EsMonitorException):
