@@ -99,7 +99,7 @@ class NodeInfo(object):
 
             indices.add(terms[5])
             metric_data["total_shards"] = metric_data["total_shards"] + 1
-        self.indices = len(indices)
+        metric_data["indices"] = len(indices)
 
     def update_from_cat_nodes(self, resp):
         '''
