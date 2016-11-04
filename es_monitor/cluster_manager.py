@@ -8,10 +8,8 @@ from oslo_config import cfg
 
 from es_monitor.nodes_manager import NodesManager
 from es_monitor.indices_manager import IndicesManager
-from es_monitor.cluster import ClusterInfo
 from es_monitor import log as logging
 from es_monitor import exception
-from es_monitor.utils.c2dict import class_to_dict
 
 LOG = logging.getLogger(__name__)
 
@@ -64,6 +62,22 @@ class ClusterManager(object):
         self.indices_manager = IndicesManager(self)
         self.nodes_manager = NodesManager(self)
         self.write_to_es = None
+
+    def reset_metrics(self):
+        metric_data = self.metric_data
+        metric_data["name"] = ''  # cluster name
+        metric_data["health"] = ''  # cluster health
+        metric_data["nodes"] = 0   # number of cluster nodes
+        metric_data["indices"] = 0  # number of cluster index
+        metric_data["total_memory"] = 0  # total memory of cluster for jvm (byte)
+        metric_data["used_memory"] = 0  # used memory of cluster for jvm (byte)
+        metric_data["total_shards"] = 0  # active shards of cluster
+        metric_data["unassigned_shards"] = 0  # unassigned shards of cluster
+        metric_data["documents"] = 0  # number of documents of cluster
+        metric_data["data"] = 0  # data capacity in byte
+        metric_data["uptime"] = 0  # elapsed time since run
+        metric_data["es_version"] = 0  # es versions
+        metric_data["timestamp"] = None  # timestamp
 
     def setup_write_to_es(self, hosts=None, transport_class=None, **kwargs):
         self.write_to_es = Elasticsearch(hosts=hosts)
@@ -305,3 +319,4 @@ class ClusterManager(object):
         self.write_to_es.index(index=index, doc_type=CONF.dtype_cluster_info, body=body)
         self.indices_manager.submit_info(self.write_to_es, index)
         self.nodes_manager.submit_info(self.write_to_es, index)
+        self.reset_metrics()

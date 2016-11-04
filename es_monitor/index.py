@@ -5,7 +5,6 @@ import json
 from oslo_config import cfg
 
 from es_monitor import log as logging
-from es_monitor.utils.c2dict import class_to_dict
 
 LOG = logging.getLogger(__name__)
 
@@ -34,11 +33,11 @@ class IndexInfo(object):
         '''
         self.manager = indices_manager
         metric_data = {}
-        metric_data["search_rate"] = 0
+        metric_data["search_rate"] = 0.0
         self.last_search_query_total = 0
         self.current_search_query_total = 0
 
-        metric_data["indexing_rate"] = 0
+        metric_data["indexing_rate"] = 0.0
         self.last_indexing_total = 0
         self.current_indexing_total = 0
 
@@ -55,6 +54,19 @@ class IndexInfo(object):
         metric_data["timestamp"] = None
         self.metric_data = metric_data
 
+        self.update_from_cat_indices(line)
+
+    def __eq__(self, other):
+        try:
+            return self.metric_data["name"] == other.metric_data["name"]
+        except:
+            return False
+
+    def __hash__(self):
+        return hash(self.metric_data["name"])
+
+    def update_from_cat_indices(self, line):
+        metric_data = self.metric_data
         terms = line.split()
         if len(terms) == 9 and terms[1] == 'open':
             metric_data["status"] = terms[1]
@@ -66,14 +78,20 @@ class IndexInfo(object):
             metric_data["health"] = 'unknown'
             metric_data["name"] = terms[1]
 
-    def __eq__(self, other):
-        try:
-            return self.metric_data["name"] == other.metric_data["name"]
-        except:
-            return False
-
-    def __hash__(self):
-        return hash(self.metric_data["name"])
+    def reset_metrics(self):
+        metric_data = self.metric_data
+        metric_data["search_rate"] = 0.0
+        metric_data["indexing_rate"] = 0.0
+        metric_data["index_size"] = 0
+        metric_data["lucene_memory"] = 0
+        metric_data["field_data_size"] = 0
+        metric_data["status"] = "unknown"
+        metric_data["health"] = ''
+        metric_data["document_count"] = 0
+        metric_data["data"] = 0
+        metric_data["total_shards"] = 0
+        metric_data["unassigned_shards"] = 0
+        metric_data["timestamp"] = None
 
     def set_timestamp(self, timestamp):
         metric_data = self.metric_data
@@ -245,3 +263,4 @@ class IndexInfo(object):
         body = json.dumps(self.metric_data)
         LOG.debug("body: %s" % body)
         es.index(index=index, doc_type=CONF.dtype_index_info, body=body)
+        self.reset_metrics()

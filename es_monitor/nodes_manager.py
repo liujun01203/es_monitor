@@ -23,6 +23,10 @@ class NodesManager(object):
         metric_data = self.metric_data
         metric_data["timestamp"] = timestamp
 
+    def reset_metrics(self):
+        metric_data = self.metric_data
+        metric_data["timestamp"] = None
+
     def set_check_interval(self, check_interval):
         self.check_interval = check_interval
 
@@ -98,6 +102,8 @@ class NodesManager(object):
             if line:
                 node = NodeInfo(line, self)
                 self.nodes.add(node)
+                node = self.get_node_info(node.metric_data["name"])
+                node.update_from_cat_nodes(line)
 
     def update_from_nodes_info(self, resp):
         LOG.debug("resp: %s" % resp)
@@ -123,3 +129,5 @@ class NodesManager(object):
         for node in self.nodes:
             node.set_timestamp(self.metric_data["timestamp"])
             node.submit_info(es, index)
+
+        self.reset_metrics()

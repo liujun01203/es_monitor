@@ -1,10 +1,12 @@
 es_monitor
----
-
+----------
+* Env
+    *Python 2.7.6
 
 * Depends:
-    * 
-    * 
+    * oslo.config
+    * oslo.service
+    * elasticsearch
 
 * Deploy
     * cd es_monitor/
@@ -15,11 +17,10 @@ es_monitor
     * pip install -e .
 
 * Config
-    * file: /etc/es_monitor/monitor.conf
+    * file: /etc/es_monitor/monitor_agent.conf
 
 * Run
-    * es-monitor
+    * monitor_agent
 
 * Test
-    * ./run_tests.sh
 

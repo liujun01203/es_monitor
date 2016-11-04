@@ -5,7 +5,6 @@ import json
 from oslo_config import cfg
 
 from es_monitor import log as logging
-from es_monitor.utils.c2dict import class_to_dict
 
 LOG = logging.getLogger(__name__)
 
@@ -72,6 +71,23 @@ class NodeInfo(object):
     def set_timestamp(self, timestamp):
         metric_data = self.metric_data
         metric_data["timestamp"] = timestamp
+
+    def reset_metrics(self):
+        metric_data = self.metric_data
+        metric_data["host"] = ''
+        metric_data["ip"] = ''
+        metric_data["documents"] = 0
+        metric_data["data"] = 0  # size in bytes
+        metric_data["disk_free_space"] = 0  # free capacity in bytes in fs
+        metric_data["indices"] = 0
+        metric_data["total_shards"] = 0
+        metric_data["search_latency"] = 0.0  # size in ms
+        metric_data["indexing_latency"] = 0.0  # size in ms
+        metric_data["jvm_heap_usage"] = 0
+        metric_data["cpu_utilization"] = 0
+        metric_data["system_load_average"] = 0  # just like uptime: last 1 minutes cpu load average
+        metric_data["segment_count"] = 0
+        metric_data["timestamp"] = None
 
     def update_from_cat_shards(self, resp):
         '''
@@ -153,3 +169,4 @@ class NodeInfo(object):
         body = json.dumps(self.metric_data)
         LOG.debug("body: %s" % body)
         es.index(index=index, doc_type=CONF.dtype_node_info, body=body)
+        self.reset_metrics()

@@ -58,6 +58,14 @@ class IndicesManager(object):
         metric_data = self.metric_data
         metric_data["timestamp"] = timestamp
 
+    def reset_metrics(self):
+        metric_data = self.metric_data
+        metric_data["search_rate"] = 0.0
+        metric_data["search_latency"] = 0.0
+        metric_data["indexing_rate"] = 0.0
+        metric_data["indexing_latency"] = 0.0
+        metric_data["timestamp"] = None
+
     def update(self, context):
         '''
         :param context:
@@ -106,6 +114,8 @@ class IndicesManager(object):
             if line:
                 index = IndexInfo(line, self)
                 self.indices.add(index)
+                index = self.get_index_info(index.metric_data["name"])
+                index.update_from_cat_indices(line)
 
     def update_from_cluster_stats(self, resp):
         LOG.debug("resp: %s" % resp)
@@ -243,3 +253,5 @@ class IndicesManager(object):
         for idex in self.indices:  # note idex not index
             idex.set_timestamp(self.metric_data["timestamp"])
             idex.submit_info(es, index)
+
+        self.reset_metrics()
