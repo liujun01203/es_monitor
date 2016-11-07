@@ -4,6 +4,7 @@
 import inspect
 import logging
 import os
+from logging.handlers import TimedRotatingFileHandler
 
 from oslo_config import cfg
 
@@ -24,6 +25,14 @@ opts = [
                deprecated_name='logfile',
                help='(Optional) Name of log file to output to. '
                     'If no default is set, logging will go to stdout.'),
+    cfg.IntOpt('log_interval',
+               default=1,
+               help='The interval time between two log files',
+               ),
+    cfg.IntOpt('log_backcount',
+               default=7,
+               help='The number of log files to reserved',
+               ),
     cfg.StrOpt('log-dir',
                deprecated_name='logdir',
                default='/var/log/es_monitor',
@@ -71,7 +80,7 @@ def getLogger(name='unknown', version='unknown'):
     if log_file is None:
         handler = logging.StreamHandler()
     else:
-        handler = logging.FileHandler(log_file)
+        handler = TimedRotatingFileHandler(filename=log_file, when='D', interval=CONF.log_interval, backupCount=CONF.log_backcount)
 
     handler.setFormatter(formatter)
     logger = logging.getLogger(name)
